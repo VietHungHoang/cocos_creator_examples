@@ -1,0 +1,10 @@
+{
+  "name": "examples",
+  "uuid": "687a41e3-a792-4e14-a91d-24e2a45ee096",
+  "creator": {
+    "version": "3.7.1"
+  },
+  "dependencies": {
+    "examples": "file:"
+  }
+}
