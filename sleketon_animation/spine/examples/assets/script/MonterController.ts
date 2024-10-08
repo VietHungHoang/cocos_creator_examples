@@ -1,8 +1,6 @@
 import {
     _decorator,
     Component,
-    Node,
-    EventMouse,
     sp,
     SystemEvent,
     EventKeyboard,
@@ -19,28 +17,29 @@ export class MonterController extends Component {
 
     onLoad() {
         input.on(Input.EventType.KEY_DOWN, this.onMouseClick, this);
+        this.spineAnimation.setAnimation(0, "idle", true);
     }
 
     onMouseClick(event: EventKeyboard) {
-        switch (event.keyCode) {
-            case KeyCode.KEY_U:
-                console.log("223");
-                this.spineAnimation.setAnimation(0, "attack", false);
-                break;
-            case KeyCode.KEY_I:
-                this.spineAnimation.setAnimation(0, "attack2", false);
-                break;
-            case KeyCode.KEY_O:
-                this.spineAnimation.setAnimation(0, "attack3", false);
-                break;
-            case KeyCode.SPACE:
-                this.spineAnimation.setAnimation(0, "get-hit", false);
-                break;
-            case KeyCode.KEY_A:
-                this.spineAnimation.setAnimation(0, "die", false);
-                break;
-            default:
-                this.spineAnimation.setAnimation(0, "idle", true);
+        if (event.keyCode === KeyCode.KEY_A) {
+            this.spineAnimation.clearTrack(0);
+            this.spineAnimation.setAnimation(1, "die", false);
+        } else {
+            this.spineAnimation.setAnimation(0, "idle", true);
+            switch (event.keyCode) {
+                case KeyCode.KEY_U:
+                    this.spineAnimation.setAnimation(1, "attack", false);
+                    break;
+                case KeyCode.KEY_I:
+                    this.spineAnimation.setAnimation(1, "attack2", false);
+                    break;
+                case KeyCode.KEY_O:
+                    this.spineAnimation.setAnimation(1, "attack3", false);
+                    break;
+                case KeyCode.SPACE:
+                    this.spineAnimation.setAnimation(1, "get-hit", false);
+                    break;
+            }
         }
     }
 
