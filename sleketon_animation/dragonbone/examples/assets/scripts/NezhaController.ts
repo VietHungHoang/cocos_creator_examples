@@ -7,6 +7,7 @@ import {
     input,
     Input,
     dragonBones,
+    math,
 } from "cc";
 const { ccclass, property } = _decorator;
 
@@ -15,45 +16,29 @@ export class NezhaController extends Component {
     @property(dragonBones.ArmatureDisplay)
     armatureDisplay: dragonBones.ArmatureDisplay = null!;
 
-    private living = true;
+    private isLiving = true;
+    private keyState: { [key: string]: boolean } = {};
+    private speed = 10;
+
 
     onLoad() {
-        input.on(Input.EventType.KEY_DOWN, this.onMouseClick, this);
-        this.armatureDisplay.playAnimation("idle", 0);
+        input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
+        input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
     }
 
-    onMouseClick(event: EventKeyboard) {
-        switch (event.keyCode) {
-            case KeyCode.KEY_U:
-                this.armatureDisplay.playAnimation("attack1", 1);
-                break;
-            case KeyCode.KEY_I:
-                this.armatureDisplay.playAnimation("attack1_1", 1);
-                break;
-            case KeyCode.KEY_O:
-                this.armatureDisplay.playAnimation("attack1_2", 1);
-                break;
-            case KeyCode.KEY_O:
-                this.armatureDisplay.playAnimation("attack1_3", 1);
-                break;
-            case KeyCode.SPACE:
-                this.armatureDisplay.playAnimation("qingzhu", 1);
-                break;
-            case KeyCode.KEY_Y:
-                this.armatureDisplay.playAnimation("run", 1);
-                break;
-            case KeyCode.KEY_T:
-                this.armatureDisplay.playAnimation("skill1", 1);
-                break;
-            case KeyCode.KEY_A:
-                this.armatureDisplay.playAnimation("dead", 1);
-                this.living = false;
-                break;
-        }
+    onKeyDown(event: EventKeyboard){
+        this.keyState[event.keyCode] = true;
     }
+
+    onKeyUp(event: EventKeyboard){
+        this.keyState[event.keyCode] = false;
+    }
+
+    
 
     update() {
-        if(this.living){
+        console.log(this.node.getRotation());
+        if(this.isLiving){
             this.armatureDisplay.once(
                 dragonBones.EventObject.COMPLETE,
                 () => {
@@ -61,11 +46,35 @@ export class NezhaController extends Component {
                 },
                 this
             );
+            if(this.keyState[KeyCode.ARROW_RIGHT] || this.keyState[KeyCode.KEY_D])
+                this.moveRight();
+            else if(this.keyState[KeyCode.ARROW_LEFT] || this.keyState[KeyCode.KEY_A])
+                this.moveLeft();
+
         }
             
     }
+    moveRight(){
+        if(this.node.getRotation().y === -180)
+            this.node.setRotationFromEuler(0, 180, 0);
+        this.armatureDisplay.playAnimation("run", 1);
+        var currentPosition = this.node.getPosition();
+        currentPosition.add3f(this.speed, 0, 0);
+        this.node.setPosition(currentPosition);
+    }
+
+    moveLeft(){
+        if(this.node.getRotation().y === 0)
+            this.node.setRotationFromEuler(0, -180, 0);
+        this.armatureDisplay.playAnimation("run", 1);
+        var currentPosition = this.node.getPosition();
+        currentPosition.add3f(-this.speed, 0, 0);
+        this.node.setPosition(currentPosition);
+
+    }
 
     onDestroy() {
-        this.node.off(SystemEvent.EventType.KEY_DOWN, this.onMouseClick, this);
+        this.node.off(SystemEvent.EventType.KEY_DOWN, this.onKeyDown, this);
+        this.node.off(SystemEvent.EventType.KEY_UP, this.onKeyUp, this);
     }
 }
